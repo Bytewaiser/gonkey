@@ -59,14 +59,44 @@ impl Lexer {
         }
     }
 
+    fn peek_char(&mut self) -> char {
+        if self.read_position >= self.input.len() {
+            '\0'
+        } else {
+            self.input.chars().nth(self.read_position).unwrap()
+        }
+    }
+
     fn next_token(&mut self) -> Token {
         if self.ch.is_whitespace() {
             self.skip_whitespace()
         }
         let mut skip = false;
         let tok: Token = match self.ch {
-            '=' => Token::new(token::ASSING.to_string(), self.ch.to_string()),
+            '=' => {
+                if self.peek_char() == '=' {
+                    let ch = self.ch;
+                    self.read_char();
+                    Token::new(token::EQ.to_string(), format!("{}{}", ch, self.ch))
+                } else {
+                    Token::new(token::ASSING.to_string(), self.ch.to_string())
+                }
+            }
             '+' => Token::new(token::PLUS.to_string(), self.ch.to_string()),
+            '-' => Token::new(token::MINUS.to_string(), self.ch.to_string()),
+            '*' => Token::new(token::ASTERISK.to_string(), self.ch.to_string()),
+            '/' => Token::new(token::SLASH.to_string(), self.ch.to_string()),
+            '!' => {
+                if self.peek_char() == '=' {
+                    let ch = self.ch;
+                    self.read_char();
+                    Token::new(token::NOT_EQ.to_string(), format!("{}{}", ch, self.ch))
+                } else {
+                    Token::new(token::BANG.to_string(), self.ch.to_string())
+                }
+            }
+            '<' => Token::new(token::LT.to_string(), self.ch.to_string()),
+            '>' => Token::new(token::GT.to_string(), self.ch.to_string()),
             '(' => Token::new(token::LPAREN.to_string(), self.ch.to_string()),
             ')' => Token::new(token::RPAREN.to_string(), self.ch.to_string()),
             '{' => Token::new(token::LBRACE.to_string(), self.ch.to_string()),
@@ -110,10 +140,22 @@ mod testing {
             let five = 5;
             let ten = 10;
             let add = fn(x, y) {
-            x + y;
+                x + y;
             };
             let result = add(five, ten);
+            !-/*5;
+            5 < 10 > 6;
+
+            if (5 < 10) {
+                return true;
+            }
+            else {
+                return false;
+            }
+            10 == 10;
+            9 != 10;
             ";
+
         struct ExpectedToken<'a> {
             expected_type: &'a str,
             expected_literal: &'a str,
@@ -164,6 +206,43 @@ mod testing {
             ExpectedToken::new(token::COMMA, ","),
             ExpectedToken::new(token::IDENT, "ten"),
             ExpectedToken::new(token::RPAREN, ")"),
+            ExpectedToken::new(token::SEMICOLON, ";"),
+            ExpectedToken::new(token::BANG, "!"),
+            ExpectedToken::new(token::MINUS, "-"),
+            ExpectedToken::new(token::SLASH, "/"),
+            ExpectedToken::new(token::ASTERISK, "*"),
+            ExpectedToken::new(token::INT, "5"),
+            ExpectedToken::new(token::SEMICOLON, ";"),
+            ExpectedToken::new(token::INT, "5"),
+            ExpectedToken::new(token::LT, "<"),
+            ExpectedToken::new(token::INT, "10"),
+            ExpectedToken::new(token::GT, ">"),
+            ExpectedToken::new(token::INT, "6"),
+            ExpectedToken::new(token::SEMICOLON, ";"),
+            ExpectedToken::new(token::IF, "if"),
+            ExpectedToken::new(token::LPAREN, "("),
+            ExpectedToken::new(token::INT, "5"),
+            ExpectedToken::new(token::LT, "<"),
+            ExpectedToken::new(token::INT, "10"),
+            ExpectedToken::new(token::RPAREN, ")"),
+            ExpectedToken::new(token::LBRACE, "{"),
+            ExpectedToken::new(token::RETURN, "return"),
+            ExpectedToken::new(token::TRUE, "true"),
+            ExpectedToken::new(token::SEMICOLON, ";"),
+            ExpectedToken::new(token::RBRACE, "}"),
+            ExpectedToken::new(token::ELSE, "else"),
+            ExpectedToken::new(token::LBRACE, "{"),
+            ExpectedToken::new(token::RETURN, "return"),
+            ExpectedToken::new(token::FALSE, "false"),
+            ExpectedToken::new(token::SEMICOLON, ";"),
+            ExpectedToken::new(token::RBRACE, "}"),
+            ExpectedToken::new(token::INT, "10"),
+            ExpectedToken::new(token::EQ, "=="),
+            ExpectedToken::new(token::INT, "10"),
+            ExpectedToken::new(token::SEMICOLON, ";"),
+            ExpectedToken::new(token::INT, "9"),
+            ExpectedToken::new(token::NOT_EQ, "!="),
+            ExpectedToken::new(token::INT, "10"),
             ExpectedToken::new(token::SEMICOLON, ";"),
             ExpectedToken::new(token::EOF, "\0"),
         ];
