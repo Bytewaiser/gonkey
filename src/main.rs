@@ -1,4 +1,7 @@
-mod lexer;
+use std::io;
+
+pub mod lexer;
+mod repl;
 pub mod token;
 
 fn main() {
@@ -21,7 +24,10 @@ fn main() {
         10 == 10;
         9 != 10;
         }
-        ";
-    let mut parser = lexer::Lexer::new(input);
-    parser.parse();
+    ";
+
+    repl::start();
+
+    // let mut parser = lexer::Lexer::new(input);
+    // parser.parse();
 }

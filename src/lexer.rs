@@ -9,7 +9,7 @@ pub struct Lexer {
     input: String,
     position: usize,
     read_position: usize,
-    ch: char,
+    pub ch: char,
 }
 
 impl Lexer {
@@ -40,8 +40,8 @@ impl Lexer {
         while is_letter(self.ch) {
             self.read_char()
         }
-        let literal = self.input.get(position..self.position).unwrap();
-        Token::from_identifier(literal)
+        let literal: String = self.input.chars().take(self.position).skip(position).collect();
+        Token::from_identifier(&literal)
     }
 
     fn read_number(&mut self) -> Token {
@@ -49,8 +49,8 @@ impl Lexer {
         while self.ch.is_digit(10) {
             self.read_char()
         }
-        let literal = self.input.get(position..self.position).unwrap();
-        Token::new(token::INT.to_string(), literal.to_string())
+        let literal: String = self.input.chars().take(self.position).skip(position).collect();
+        Token::new(token::INT.to_string(), literal)
     }
 
     fn skip_whitespace(&mut self) {
@@ -67,7 +67,7 @@ impl Lexer {
         }
     }
 
-    fn next_token(&mut self) -> Token {
+    pub fn next_token(&mut self) -> Token {
         if self.ch.is_whitespace() {
             self.skip_whitespace()
         }
