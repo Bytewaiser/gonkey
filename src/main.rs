@@ -1,11 +1,10 @@
-use std::io;
-
+mod ast;
 pub mod lexer;
 mod repl;
 pub mod token;
 
 fn main() {
-    let input = "
+    let _input = "
         let five = 5;
         let ten = 10;
         let add = fn(x, y) {
