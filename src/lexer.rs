@@ -5,6 +5,7 @@ fn is_letter(ch: char) -> bool {
     'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '_' || ch == '-'
 }
 
+#[derive(Clone)]
 pub struct Lexer {
     input: String,
     position: usize,

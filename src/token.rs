@@ -33,7 +33,7 @@ pub const IF: &str = "IF";
 pub const ELSE: &str = "ELSE";
 pub const RETURN: &str = "RETURN";
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Token {
     pub token_type: String,
     pub literal: String,

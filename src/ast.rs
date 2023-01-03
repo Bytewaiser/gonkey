@@ -4,18 +4,14 @@ trait Node {
     fn token_literal(&self) -> String;
 }
 
-struct Statement {}
-impl Node for Statement {
-    fn token_literal(&self) -> String {todo!()} 
+pub trait Statement: Node {
 }
 
-struct Expression {}
-impl Node for Expression {
-    fn token_literal(&self) -> String {todo!()} 
+pub trait Expression: Node {
 }
 
-struct Program {
-    statements: Vec<Statement>,
+pub struct Program {
+    pub statements: Vec<dyn Statement>,
 }
 
 impl Node for Program {
@@ -28,13 +24,50 @@ impl Node for Program {
     }
 }
 
+impl Program {
+    pub fn new() -> Program {
+        Program {
+            statements: Vec::new(),
+        }
+    }
+}
+
 struct Identifier {
     token: token::Token,
     value: String,
 }
 
-struct LetStatement {
+impl Node for Identifier {
+    fn token_literal(&self) -> String {
+        self.token.literal
+    }
+}
+
+impl Identifier {
+    pub fn new(tok: token::Token, value: String) -> Identifier {
+        Identifier { token: tok, value }
+    }
+}
+
+pub struct LetStatement {
     token: token::Token,
-    name: Identifier,
-    value: Expression,
+    name: *mut Identifier,
+    value: dyn Expression,
+}
+
+impl Node for LetStatement {
+    fn token_literal(&self) -> String {
+        self.token.literal.clone()
+    }
+}
+
+impl LetStatement {
+    pub fn new() -> LetStatement {
+        let tok = token::Token::new(token::LET.to_string(), "let".to_string());
+        LetStatement {
+            token: tok,
+            name: &mut Identifier::new(tok, "let".to_string()),
+            value: Expression::new()
+        }
+    }
 }
