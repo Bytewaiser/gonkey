@@ -8,28 +8,39 @@ const (
 	IDENT = "IDENT"
 	INT   = "INT"
 
-    // Operators
-    ASSIGN = "="
-    PLUS = "+"
+	// Operators
+	ASSIGN = "="
+	PLUS   = "+"
 
-    // Delimeters
-    COMMA = ","
-    SEMICOLON = ";"
+	// Delimeters
+	COMMA     = ","
+	SEMICOLON = ";"
 
-    LPAREN = "("
-    RPAREN = ")"
-    LBRACE = "{"
-    RBRACE = "}"
+	LPAREN = "("
+	RPAREN = ")"
+	LBRACE = "{"
+	RBRACE = "}"
 
-    // Keywords
-    FUNCTION = "FUNCTION"
-    LET = "LET"
-
+	// Keywords
+	FUNCTION = "FUNCTION"
+	LET      = "LET"
 )
 
-type TokenString string
+type TokenType string
 
 type Token struct {
-	Type    TokenString
+	Type    TokenType
 	Literal string
+}
+
+var keywords = map[string]TokenType{
+    "fn": FUNCTION,
+    "let": LET,
+}
+
+func LookupIdent(ident string) TokenType {
+    if tok, ok := keywords[ident]; ok {
+        return tok
+    }
+    return IDENT
 }
